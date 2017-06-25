@@ -1,0 +1,19 @@
+#myProgress {
+  position: fixed;
+    top: 250px;
+  right:50%;
+    margin-right:-250px; 
+    width:500px;
+/*  background-color: #ddd;*/
+    background-color: lightgrey;
+}
+
+#myBar {
+  width:0px;
+  height: 30px;
+/*  background-color: #4CAF50;*/
+  background-color: black;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+}
