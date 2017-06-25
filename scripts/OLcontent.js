@@ -18,8 +18,9 @@ function updateProgress(percent,myProgress,myBar){
     var width = percent;
     elem.style.width = width + '%'; 
     elem.innerHTML = width * 1  + '%';
-    if(count==totalNum){
-        setTimeout(function(){document.body.removeChild(myProgress);},1500);
+    if(count>=totalNum){
+        myBar.innerHTML="Complete !";
+        setTimeout(function(){document.body.removeChild(myProgress);},1000);
     }
     
     
