@@ -317,6 +317,7 @@ for(var i=0;i<allLinks.length;i++){
     }
 }
 
+var excludedTexts=['citation needed','Learn how and when to remove this template message','a','b','c','d','e','f','g','h','i','j'];
 
 for(var i=0;i<books.length;i++){
     
@@ -328,7 +329,7 @@ for(var i=0;i<books.length;i++){
     
     
     var text=book.innerHTML;
-    if(text=='citation needed' || text=='Learn how and when to remove this template message'){
+    if(excludedTexts.indexOf(text)>=0){
         count++;
         
         continue;
