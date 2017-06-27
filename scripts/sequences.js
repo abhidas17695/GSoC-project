@@ -236,6 +236,7 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
         // Dimensions of sunburst.
         document.getElementById('sequence').innerHTML="";
         document.getElementById('chart').innerHTML="";
+        document.getElementById('message').innerHTML="";
         var width = window.innerWidth-150;
         var height = window.innerHeight-150;
         var radius = Math.min(width, height) / 2;
@@ -493,6 +494,7 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
         var length=csv.length;
         if(length>10000){
             length=10000;
+            document.getElementById('message').innerHTML="There are "+csv.length+" webpages from the home page for "+IAglobvar+". The system is not able to render so much data properly";
         }
         var root = {"name": "root", "children": []};
         for (var i = 0; i < length; i++) {

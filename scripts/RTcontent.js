@@ -28,8 +28,8 @@ modalContent.setAttribute('class','modal-content');
 var span=document.createElement('button');
 var divBtn=document.createElement('div');
 divBtn.setAttribute('id','divBtn');
-
-
+var message=document.createElement('div');
+message.setAttribute('id','message');
 
 span.innerHTML='&times';
 span.setAttribute('class','RTclose');
@@ -41,9 +41,11 @@ chart.setAttribute('id','chart');
 main.setAttribute('id','main');
 
 modal.appendChild(divBtn);
+
 modal.appendChild(span);
 modal.appendChild(sequence);
 modal.appendChild(chart);
+modal.appendChild(message);
 document.body.appendChild(modal);
 
 modal.style.display = "block";

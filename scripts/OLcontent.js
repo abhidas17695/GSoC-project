@@ -124,12 +124,25 @@ function makeReqforBookNames(xhr,text,elem,alert){
             try{
             var response = JSON.parse(xhr.responseText);
             if(response.num_found!=0){
-                var linkElem=document.createElement('a');
+                var linkElem=document.createElement('span');
+                linkElem.setAttribute('class','bookLink');
+                //var span=document.createElement('span');
+                //span.setAttribute('class','bookLink');
+                //var url = chrome.runtime.getURL('images/magnifying-glass.cur');
+                //span.style.cursor=url;
+                linkElem.style.cursor="alias";
                 var link="https://openlibrary.org/search?q="+text;
-                linkElem.setAttribute('href',link);
-                linkElem.setAttribute('target','_blank');
+                //linkElem.setAttribute('href',link);
+                //linkElem.setAttribute('target','_blank');
+                
+                //linkElem.style.textDecoration="none";
                 linkElem.style.color="red";
                 linkElem.innerHTML=text;
+                linkElem.addEventListener('click',function(eventObj){
+                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {
+	});
+                });
+                //span.appendChild(linkElem);
 //                if(elem instanceof Selection){
 //                    var range = elem.getRangeAt(0).cloneRange();
 //                    console.log(range);
@@ -282,6 +295,8 @@ function makeReqforNum(xhr,code_no,typeofCode,elem){
                 
                 linkElem.setAttribute('href',link);
                 linkElem.setAttribute('target','_blank');
+                //linkElem.setAttribute('class','bookLink');
+                linkElem.style.cursor="grab";
                 linkElem.style.color="red";
                 linkElem.innerHTML=code_no;
                 elem.replaceChild(linkElem,elem.childNodes[0]);
