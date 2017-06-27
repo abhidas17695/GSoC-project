@@ -278,7 +278,7 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
         
         var csv = d3.csvParseRows(text);
         var json = buildHierarchy(csv);
-        console.log(json);
+        //console.log(json);
         createVisualization(json);
         
         
@@ -490,8 +490,12 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
       // root to leaf, separated by hyphens. The second column is a count of how 
       // often that sequence occurred.
       function buildHierarchy(csv) {
+        var length=csv.length;
+        if(length>10000){
+            length=10000;
+        }
         var root = {"name": "root", "children": []};
-        for (var i = 0; i < csv.length; i++) {
+        for (var i = 0; i < length; i++) {
           var sequence = csv[i][0];
           var size = +csv[i][1];
           if (isNaN(size)) { // e.g. if this is a header row
