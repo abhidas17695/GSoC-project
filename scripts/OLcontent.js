@@ -82,8 +82,7 @@ function getSelectedText(eventObj){
                   break;
               }
           }
-          //console.log(text);
-          //chrome.runtime.sendMessage({text:text});
+          
           var xhr=new XMLHttpRequest();
           xhr.open("GET","https://openlibrary.org/search.json?q="+text, true);
           
@@ -124,42 +123,22 @@ function makeReqforBookNames(xhr,text,elem,alert){
             try{
             var response = JSON.parse(xhr.responseText);
             if(response.num_found!=0){
-                var linkElem=document.createElement('span');
+                var docs=response.docs;
+                for(var i=0;i<docs.length;i++){
+                    if(docs[i].has_fulltext==true && (docs[i].ia!=null || docs[i].ia!=undefined ) && docs[i].public_scan_b==true){
+                        var iaID=docs[i].ia[0];
+                        var linkElem=document.createElement('span');
                 linkElem.setAttribute('class','bookLink');
-                //var span=document.createElement('span');
-                //span.setAttribute('class','bookLink');
-                //var url = chrome.runtime.getURL('images/magnifying-glass.cur');
-                //span.style.cursor=url;
-                linkElem.style.cursor="alias";
-                var link="https://openlibrary.org/search?q="+text;
-                //linkElem.setAttribute('href',link);
-                //linkElem.setAttribute('target','_blank');
                 
-                //linkElem.style.textDecoration="none";
+                linkElem.style.cursor="alias";
+                
+                var link="https://archive.org/details/"+iaID;
                 linkElem.style.color="red";
                 linkElem.innerHTML=text;
                 linkElem.addEventListener('click',function(eventObj){
-                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {
-	});
+                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {});
                 });
-                //span.appendChild(linkElem);
-//                if(elem instanceof Selection){
-//                    var range = elem.getRangeAt(0).cloneRange();
-//                    console.log(range);
-//                    range.surroundContents(linkElem);
-//                    
-//                    if(elem.childNodes.length>0){
-//                        if(elem.childNodes[0].nodeName=='A'){
-//                        elem.removeChild(elem.childNodes[0]);
-//                    }
-//                    }
-//                    
-//                    elem.removeAllRanges();
-//                    elem.addRange(range);
-//                    if(window.getSelection) window.getSelection().removeAllRanges();
-//                }else{
-//                    elem.replaceChild(linkElem,elem.childNodes[0]);
-//                }
+
                   if(elem instanceof Selection){
                     var range = elem.getRangeAt(0);
             
@@ -173,11 +152,17 @@ function makeReqforBookNames(xhr,text,elem,alert){
                     elem.replaceChild(linkElem,elem.childNodes[0]);
                     
                 }
+                        break;
+                    }
+                }
+                
                 
                 
                 
             }else if(response.num_found==0 && alert==true){
-                if(window.getSelection) window.getSelection().removeAllRanges();
+                if(window.getSelection){
+                     window.getSelection().removeAllRanges();
+                }
             }
             if(!(elem instanceof Selection)){
                 count++;
@@ -187,7 +172,7 @@ function makeReqforBookNames(xhr,text,elem,alert){
         }
             catch(e){
               count++;
-              //console.log(totalNum,count,e);
+              //console.log(totalNum,cou
             }
         };
         }
@@ -310,27 +295,27 @@ function makeReqforNum(xhr,code_no,typeofCode,elem){
         xhr.send(null);
 }
 
-for(var i=0;i<allLinks.length;i++){
-    if(allLinks[i].getAttribute('href')!=null){
-    if(allLinks[i].getAttribute('href').includes('Special:BookSources')){
-        //console.log(allLinks[i]);
-        var isbn_no=allLinks[i].innerHTML.split('-').join('').match(/\d+/g)[0];
-        //var isbn_no=allLinks[i].innerHTML;
-        isbn.push(isbn_no);
-        var xhr = new XMLHttpRequest();
-        //xhr.open("GET","https://archive.org/services/book/v1/do_we_have_it/?isbn="+isbn_no, true);
-        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&format=json&jscmd=data", true);
-        makeReqforNum(xhr,isbn_no,'isbn',allLinks[i]);
-    }else if(allLinks[i].getAttribute('href').includes('oclc')){
-        
-        var oclc_no=allLinks[i].innerHTML;
-        oclc.push(oclc_no);
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=OCLC:"+oclc_no+"&format=json&jscmd=data", true);
-        makeReqforNum(xhr,oclc_no,'oclc',allLinks[i]);
-    }
-    }
-}
+//for(var i=0;i<allLinks.length;i++){
+//    if(allLinks[i].getAttribute('href')!=null){
+//    if(allLinks[i].getAttribute('href').includes('Special:BookSources')){
+//        //console.log(allLinks[i]);
+//        var isbn_no=allLinks[i].innerHTML.split('-').join('').match(/\d+/g)[0];
+//        //var isbn_no=allLinks[i].innerHTML;
+//        isbn.push(isbn_no);
+//        var xhr = new XMLHttpRequest();
+//        //xhr.open("GET","https://archive.org/services/book/v1/do_we_have_it/?isbn="+isbn_no, true);
+//        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&format=json&jscmd=data", true);
+//        makeReqforNum(xhr,isbn_no,'isbn',allLinks[i]);
+//    }else if(allLinks[i].getAttribute('href').includes('oclc')){
+//        
+//        var oclc_no=allLinks[i].innerHTML;
+//        oclc.push(oclc_no);
+//        var xhr = new XMLHttpRequest();
+//        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=OCLC:"+oclc_no+"&format=json&jscmd=data", true);
+//        makeReqforNum(xhr,oclc_no,'oclc',allLinks[i]);
+//    }
+//    }
+//}
 
 var excludedTexts=['citation needed','Learn how and when to remove this template message','a','b','c','d','e','f','g','h','i','j'];
 
@@ -352,8 +337,9 @@ for(var i=0;i<books.length;i++){
     
     var xhr = new XMLHttpRequest();
    
-    xhr.open("GET","https://openlibrary.org/search.json?q="+text, true);
+    //xhr.open("GET","https://openlibrary.org/search.json?q="+text, true);
     //xhr.open("GET","https://archive.org/details/texts?&and[]="+text, true);
+    xhr.open("GET","https://openlibrary.org/search.json?q="+text, true);
     makeReqforBookNames(xhr,text,elem,false);
     //xhr.onload=xhrReqs[i];
     //xhr.send(null);
