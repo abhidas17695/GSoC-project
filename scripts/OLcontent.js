@@ -18,7 +18,7 @@ function updateProgress(percent,myProgress,myBar){
     var width = percent;
     elem.style.width = width + '%'; 
     elem.innerHTML = width * 1  + '%';
-    if(count>=totalNum){
+    if(count>=totalNum && percent<=100){
         myBar.innerHTML="Complete !";
         setTimeout(function(){document.body.removeChild(myProgress);},1000);
     }
@@ -61,12 +61,13 @@ function updateProgress(percent,myProgress,myBar){
 //}
 
 function getSelectedText(eventObj){
-    var elem=eventObj.target;
+
     
     if(window.getSelection) { 
       var text= window.getSelection().toString();
       if(text!=""){
-          
+          var elem=window.getSelection();
+          //console.log(elem.toString());
           var text=text.trim();
           for(var i=0;i<text.length;i++){
               if(text.charAt(i)=="\""){
@@ -85,8 +86,8 @@ function getSelectedText(eventObj){
           
           var xhr=new XMLHttpRequest();
           xhr.open("GET","https://openlibrary.org/search.json?q="+text, true);
-          
-          makeReqforBookNames(xhr,text,window.getSelection(),true);
+          //console.log(elem.toString());
+          makeReqforBookNames(xhr,text,elem,true);
           
       }
   }
@@ -123,27 +124,53 @@ function makeReqforBookNames(xhr,text,elem,alert){
             try{
             var response = JSON.parse(xhr.responseText);
             if(response.num_found!=0){
+                //console.log(elem.toString());
+                var flag=0;
                 var docs=response.docs;
                 for(var i=0;i<docs.length;i++){
                     if(docs[i].has_fulltext==true && (docs[i].ia!=null || docs[i].ia!=undefined ) && docs[i].public_scan_b==true){
                         var iaID=docs[i].ia[0];
-                        var linkElem=document.createElement('span');
+                        var linkElem=document.createElement('a');
                 linkElem.setAttribute('class','bookLink');
-                
+           
                 linkElem.style.cursor="alias";
                 
                 var link="https://archive.org/details/"+iaID;
-                linkElem.style.color="red";
+                linkElem.style.color="#09FF0A";
+                linkElem.setAttribute('href',link);
+                linkElem.setAttribute('target','_blank');
+                linkElem.style.textDecoration='none';
                 linkElem.innerHTML=text;
-                linkElem.addEventListener('click',function(eventObj){
-                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {});
-                });
-
+//                linkElem.addEventListener('click',function(eventObj){
+//                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {});
+//                });
+                
                   if(elem instanceof Selection){
+                    
+                      console.log(elem.toString());
                     var range = elem.getRangeAt(0);
-            
-                    range.deleteContents();
-                    range.insertNode(linkElem);
+//                    var ancestor=range.commonAncestorContainer;
+//                    console.log(ancestor.nodeName);
+//                      if(ancestor.nodeName=='#text'){
+//                          ancestor=ancestor.parentNode;
+//                          
+//                      }
+//                      if(ancestor.nodeName=='A'){
+//                          ancestor=ancestor.parentNode;
+//                      }
+//                        ancestor.innerHTML="";
+//                        console.log(ancestor);
+//                        ancestor.appendChild(linkElem);
+                        
+                        
+                        range.deleteContents();
+                        range.insertNode(linkElem);
+//                        if(linkElem.parentNode.tagName=='a'){
+//                            console.log('Here');
+//                            var grandp=linkElem.parentNode.parentNode;
+//                            grandp.replaceChild(linkElem,linkElem.parentNode);
+//                        }
+                    
                     
                     
 
@@ -152,10 +179,15 @@ function makeReqforBookNames(xhr,text,elem,alert){
                     elem.replaceChild(linkElem,elem.childNodes[0]);
                     
                 }
+                        flag=1;
                         break;
                     }
                 }
-                
+                if(flag==0){
+                    if(window.getSelection){
+                     window.getSelection().removeAllRanges();
+                }
+                }
                 
                 
                 
@@ -262,60 +294,63 @@ function makeReqforBookNames(xhr,text,elem,alert){
 //}
 
 
-function makeReqforNum(xhr,code_no,typeofCode,elem){
-    
-    
-        xhr.onload=function(){
-            var response =xhr.responseText;
-            
-                if(response!='{}'){
-                
-                
-                
-                
-                var linkElem=document.createElement('a');
-                    
-                        var link="https://openlibrary.org/books/"+typeofCode+"/"+code_no;
-                    
-                
-                linkElem.setAttribute('href',link);
-                linkElem.setAttribute('target','_blank');
-                //linkElem.setAttribute('class','bookLink');
-                linkElem.style.cursor="grab";
-                linkElem.style.color="red";
-                linkElem.innerHTML=code_no;
-                elem.replaceChild(linkElem,elem.childNodes[0]);
-                    
-            }
-            count++;
-            percent=Math.floor((count/totalNum)*100);
-            updateProgress(percent,myProgess,myBar);
-            
-        };
-        xhr.send(null);
-}
+//function makeReqforNum(xhr,code_no,typeofCode,elem){
+//    
+//    
+//        xhr.onload=function(){
+//            var response =xhr.responseText;
+//            
+//                if(response!='{}'){
+//                
+//                
+//                
+//                
+//                var linkElem=document.createElement('a');
+//                    
+//                        var link="https://openlibrary.org/books/"+typeofCode+"/"+code_no;
+//                    
+//                
+//                linkElem.setAttribute('href',link);
+//                linkElem.setAttribute('target','_blank');
+//                //linkElem.setAttribute('class','bookLink');
+//                linkElem.style.cursor="grab";
+//                linkElem.style.color="red";
+//                linkElem.innerHTML=code_no;
+//                elem.replaceChild(linkElem,elem.childNodes[0]);
+//                    
+//            }
+//            count++;
+//            percent=Math.floor((count/totalNum)*100);
+//            updateProgress(percent,myProgess,myBar);
+//            
+//        };
+//        xhr.send(null);
+//}
 
-//for(var i=0;i<allLinks.length;i++){
-//    if(allLinks[i].getAttribute('href')!=null){
-//    if(allLinks[i].getAttribute('href').includes('Special:BookSources')){
-//        //console.log(allLinks[i]);
-//        var isbn_no=allLinks[i].innerHTML.split('-').join('').match(/\d+/g)[0];
-//        //var isbn_no=allLinks[i].innerHTML;
-//        isbn.push(isbn_no);
-//        var xhr = new XMLHttpRequest();
-//        //xhr.open("GET","https://archive.org/services/book/v1/do_we_have_it/?isbn="+isbn_no, true);
-//        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&format=json&jscmd=data", true);
-//        makeReqforNum(xhr,isbn_no,'isbn',allLinks[i]);
-//    }else if(allLinks[i].getAttribute('href').includes('oclc')){
-//        
+for(var i=0;i<allLinks.length;i++){
+    if(allLinks[i].getAttribute('href')!=null){
+    if(allLinks[i].getAttribute('href').includes('Special:BookSources')){
+        //console.log(allLinks[i]);
+        var isbn_no=allLinks[i].innerHTML.split('-').join('').match(/\d+/g)[0];
+        //var isbn_no=allLinks[i].innerHTML;
+        isbn.push(isbn_no);
+        var xhr = new XMLHttpRequest();
+        var elem=allLinks[i];
+        //xhr.open("GET","https://archive.org/services/book/v1/do_we_have_it/?isbn="+isbn_no, true);
+        //xhr.open("GET","https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&format=json&jscmd=data", true);
+        xhr.open("GET","https://openlibrary.org/search.json?q="+isbn_no, true);
+        //makeReqforNum(xhr,isbn_no,'isbn',allLinks[i]);
+        makeReqforBookNames(xhr,isbn_no,elem,false);
+    }else if(allLinks[i].getAttribute('href').includes('oclc')){
+        
 //        var oclc_no=allLinks[i].innerHTML;
 //        oclc.push(oclc_no);
 //        var xhr = new XMLHttpRequest();
 //        xhr.open("GET","https://openlibrary.org/api/books?bibkeys=OCLC:"+oclc_no+"&format=json&jscmd=data", true);
 //        makeReqforNum(xhr,oclc_no,'oclc',allLinks[i]);
-//    }
-//    }
-//}
+    }
+    }
+}
 
 var excludedTexts=['citation needed','Learn how and when to remove this template message','a','b','c','d','e','f','g','h','i','j'];
 
