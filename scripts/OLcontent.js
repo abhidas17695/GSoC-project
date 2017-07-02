@@ -67,7 +67,7 @@ function getSelectedText(eventObj){
       var text= window.getSelection().toString();
       if(text!=""){
           var elem=window.getSelection();
-          //console.log(elem.toString());
+          console.log("Got a selection");
           var text=text.trim();
           for(var i=0;i<text.length;i++){
               if(text.charAt(i)=="\""){

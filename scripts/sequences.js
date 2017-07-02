@@ -39,6 +39,8 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
           url=url.replace('www2','www');
         }else if(url.includes('www3')){
           url=url.replace('www3','www');
+        }else if(url.includes('www0')){
+            url=url.replace('www0','www');
         }
         if(url.indexOf('://www')==(-1)){
           
@@ -300,9 +302,9 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
           
           // For efficiency, filter nodes to keep only those large enough to see.
           var nodes = partition(root).descendants()
-          .filter(function(d) {
-            return (d.x1 - d.x0 > 0.005); // 0.005 radians = 0.29 degrees
-          });
+//          .filter(function(d) {
+//            return (d.x1 - d.x0 > 0.005); // 0.005 radians = 0.29 degrees
+//          });
           
           var path = vis.data([json]).selectAll("path")
           .data(nodes)
@@ -492,10 +494,10 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
       // often that sequence occurred.
       function buildHierarchy(csv) {
         var length=csv.length;
-        if(length>10000){
-            length=10000;
-            document.getElementById('message').innerHTML="There are "+csv.length+" webpages from the home page for "+IAglobvar+". The system is not able to render so much data properly";
-        }
+//        if(length>10000){
+//            length=10000;
+//            document.getElementById('message').innerHTML="There are "+csv.length;
+//        }
         var root = {"name": "root", "children": []};
         for (var i = 0; i < length; i++) {
           var sequence = csv[i][0];
