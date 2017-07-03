@@ -11,7 +11,7 @@ myBar.setAttribute('id','myBar');
 myBar.innerHTML="";
 myProgess.appendChild(myBar);
 document.body.appendChild(myProgess);
-
+//isSelected=false;
 function updateProgress(percent,myProgress,myBar){
     //console.log(totalNum,count,percent);
     var elem =myBar;   
@@ -66,6 +66,7 @@ function getSelectedText(eventObj){
     if(window.getSelection) { 
       var text= window.getSelection().toString();
       if(text!=""){
+          
           var elem=window.getSelection();
           console.log("Got a selection");
           var text=text.trim();
@@ -139,13 +140,13 @@ function makeReqforBookNames(xhr,text,elem,alert){
                 linkElem.style.color="#09FF0A";
                 linkElem.setAttribute('href',link);
                 linkElem.setAttribute('target','_blank');
-                linkElem.style.textDecoration='none';
+                
                 linkElem.innerHTML=text;
 //                linkElem.addEventListener('click',function(eventObj){
 //                    chrome.runtime.sendMessage({message: "openurl",url:link}, function(response) {});
 //                });
                 
-                  if(elem instanceof Selection){
+                  if(elem instanceof Selection && elem.toString()!=""){
                     
                       console.log(elem.toString());
                     var range = elem.getRangeAt(0);
@@ -165,6 +166,7 @@ function makeReqforBookNames(xhr,text,elem,alert){
                         
                         range.deleteContents();
                         range.insertNode(linkElem);
+                        
 //                        if(linkElem.parentNode.tagName=='a'){
 //                            console.log('Here');
 //                            var grandp=linkElem.parentNode.parentNode;
