@@ -402,7 +402,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     chrome.webRequest.onErrorOccurred.addListener(function(details) {
       function tabIsReady(isIncognito) {
         if(details.error == 'net::ERR_NAME_NOT_RESOLVED' || details.error == 'net::ERR_NAME_RESOLUTION_FAILED'
-        || details.error == 'net::ERR_CONNECTION_TIMED_OUT'  || details.error == 'net::ERR_NAME_NOT_RESOLVED' || details.error == 'net::ERR_FAILED' ){
+        || details.error == 'net::ERR_CONNECTION_TIMED_OUT'  || details.error == 'net::ERR_NAME_NOT_RESOLVED' ){
           wmAvailabilityCheck(details.url, function(wayback_url, url) {
             chrome.tabs.update(details.tabId, {url: chrome.extension.getURL('dnserror.html')+"?url="+wayback_url});
           }, function() {
@@ -492,7 +492,8 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 function restoreSettings() {
           chrome.storage.sync.set({
             ts:true,
-            rt:true
+            rt:true,
+            book:true
           });
 }
 
