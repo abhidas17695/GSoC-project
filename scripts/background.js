@@ -343,6 +343,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
                   chrome.notifications.create(
                 'wayback-notification',{   
                 type: 'basic', 
+                requireInteraction:true,
                 iconUrl: '/images/logo.gif', 
                 title: "Page not available ?", 
                 message:"View an archived version courtesy of the WayBack Machine",
