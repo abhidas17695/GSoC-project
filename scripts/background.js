@@ -275,36 +275,36 @@ function rewriteUserAgentHeader(e) {
 }
 
 myNotID=null;
-function notify(wayback_url,msg)
-{
-  chrome.notifications.create(
-                'wayback-notification',{   
-                type: 'basic', 
-                iconUrl: '/images/logo.gif', 
-                title: "Page not available ?", 
-                message: msg,
-                buttons:[{
-                    title: "Click here to see archived version"
-                }]
-                },
-                function(id){
-                    myNotID=id;
-                } 
-              );
-
-chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
-    if (notifId === myNotID) {
-        if (btnIdx === 0) {
-                chrome.notifications.clear(myNotID);
-                chrome.tabs.create({ url:wayback_url});
-                
-            
-            
-        }
-    }
-});
-}
-
+//function notify(wayback_url,msg)
+//{
+//  chrome.notifications.create(
+//                'wayback-notification',{   
+//                type: 'basic', 
+//                iconUrl: '/images/logo.gif', 
+//                title: "Page not available ?", 
+//                message: msg,
+//                buttons:[{
+//                    title: "Click here to see archived version"
+//                }]
+//                },
+//                function(id){
+//                    myNotID=id;
+//                } 
+//              );
+//
+//
+//}
+//chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
+//    if (notifId === myNotID) {
+//        if (btnIdx === 0) {
+//                chrome.notifications.clear(myNotID);
+//                chrome.tabs.create({ url:wayback_url});
+//                
+//            
+//            
+//        }
+//    }
+//});
 
 
 /*
@@ -339,7 +339,34 @@ chrome.webRequest.onCompleted.addListener(function(details) {
               wmAvailabilityCheck(details.url, function(wayback_url, url) {
               
               if(details.statusCode==504){
-                  notify(wayback_url,'View an archived version courtesy of the Internet Archive WayBack Machine');
+                  //notify(wayback_url,'View an archived version courtesy of the Internet Archive WayBack Machine');
+                  chrome.notifications.create(
+                'wayback-notification',{   
+                type: 'basic', 
+                iconUrl: '/images/logo.gif', 
+                title: "Page not available ?", 
+                message:"View an archived version courtesy of the WayBack Machine",
+                buttons:[{
+                    title: "Click here to see archived version"
+                }]
+                },
+                function(id){
+                    myNotID=id;
+                } 
+              );
+              chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
+    if (notifId === myNotID) {
+        if (btnIdx === 0) {
+                
+                chrome.tabs.create({ url:wayback_url});
+                chrome.notifications.clear(myNotID);
+                myNotID=null;
+                
+            
+            
+        }
+    }
+});
               }else{
                   chrome.tabs.executeScript(details.tabId, {
               file: "scripts/client.js"
