@@ -7,6 +7,7 @@
   
   
   "permissions": [
+    "notifications",
     "tabs",
     "activeTab",
     "webRequest",

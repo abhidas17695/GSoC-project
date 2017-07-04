@@ -274,6 +274,39 @@ function rewriteUserAgentHeader(e) {
   return {requestHeaders: e.requestHeaders};
 }
 
+myNotID=null;
+function notify(wayback_url,msg)
+{
+  chrome.notifications.create(
+                'wayback-notification',{   
+                type: 'basic', 
+                iconUrl: '/images/logo.gif', 
+                title: "Page not available ?", 
+                message: msg,
+                buttons:[{
+                    title: "Click here to see archived version"
+                }]
+                },
+                function(id){
+                    myNotID=id;
+                } 
+              );
+
+chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
+    if (notifId === myNotID) {
+        if (btnIdx === 0) {
+                chrome.notifications.clear(myNotID);
+                chrome.tabs.create({ url:wayback_url});
+                
+            
+            
+        }
+    }
+});
+}
+
+
+
 /*
 * Add rewriteUserAgentHeader as a listener to onBeforeSendHeaders
 * Make it "blocking" so we can modify the headers.
@@ -289,6 +322,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 /**
 * Header callback
 */
+
+
 chrome.webRequest.onCompleted.addListener(function(details) {
   function tabIsReady(isIncognito) {
     var httpFailCodes = [404, 408, 410, 451, 500, 502, 503, 504,
@@ -298,8 +333,15 @@ chrome.webRequest.onCompleted.addListener(function(details) {
         details.frameId === 0 &&
         httpFailCodes.indexOf(details.statusCode) >= 0 &&
         isValidUrl(details.url)) {
-          wmAvailabilityCheck(details.url, function(wayback_url, url) {
-            chrome.tabs.executeScript(details.tabId, {
+          
+              
+          
+              wmAvailabilityCheck(details.url, function(wayback_url, url) {
+              
+              if(details.statusCode==504){
+                  notify(wayback_url,'View an archived version courtesy of the Internet Archive WayBack Machine');
+              }else{
+                  chrome.tabs.executeScript(details.tabId, {
               file: "scripts/client.js"
             }, function() {
               chrome.tabs.sendMessage(details.tabId, {
@@ -307,9 +349,16 @@ chrome.webRequest.onCompleted.addListener(function(details) {
                 wayback_url: wayback_url
               });
             });
+              }
+            
           }, function() {
             
           });
+          
+              
+          
+        
+          
         }
       }
       if(details.tabId >0 ){
@@ -325,7 +374,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     chrome.webRequest.onErrorOccurred.addListener(function(details) {
       function tabIsReady(isIncognito) {
         if(details.error == 'net::ERR_NAME_NOT_RESOLVED' || details.error == 'net::ERR_NAME_RESOLUTION_FAILED'
-        || details.error == 'net::ERR_CONNECTION_TIMED_OUT'  || details.error == 'net::ERR_NAME_NOT_RESOLVED' ){
+        || details.error == 'net::ERR_CONNECTION_TIMED_OUT'  || details.error == 'net::ERR_NAME_NOT_RESOLVED' || details.error == 'net::ERR_FAILED' ){
           wmAvailabilityCheck(details.url, function(wayback_url, url) {
             chrome.tabs.update(details.tabId, {url: chrome.extension.getURL('dnserror.html')+"?url="+wayback_url});
           }, function() {
