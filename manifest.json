@@ -29,7 +29,7 @@
     "images/magnifying-glass.cur",
     "scripts/client.js",
     "scripts/TScontent.js",
-    
+    "scripts/orcidcontent.js",
     "scripts/jquery.js",
     "scripts/bootstrap.js",
     "css/bootstrap.css",

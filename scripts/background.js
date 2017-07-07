@@ -487,13 +487,21 @@ chrome.webRequest.onCompleted.addListener(function(details) {
                 });
       }
 
+function inject_orcid(id){
+          chrome.tabs.executeScript(id, {
+                  file:"scripts/orcidcontent.js"
+                });
+                
+      }
+
 
 
 function restoreSettings() {
           chrome.storage.sync.set({
             ts:true,
             rt:true,
-            book:true
+            book:true,
+            orcid:true
           });
 }
 
@@ -577,6 +585,15 @@ restoreSettings();
           }
           
       });
+        }else if(message.message=='start_orcid'){
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          var tab = tabs[0];
+          
+              chrome.tabs.executeScript(tab.id, {
+                  file:"scripts/orcidcontent.js"
+                });
+          
+      });
         }
       });
       chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){  
@@ -592,6 +609,13 @@ restoreSettings();
             });
             
           }
+          chrome.storage.sync.get(['orcid'], function(items) {
+                  
+              if(items.orcid){
+                inject_orcid(tab.id);
+              }
+            });
+          
         });
       });
       

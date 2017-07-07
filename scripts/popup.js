@@ -47,12 +47,14 @@ function restoreSettings() {
     
     ts:true,
     rt:true,
-    book:true
+    book:true,
+    orcid:true
   }, function(items) {
     
     document.getElementById('ts').checked = items.ts;
     document.getElementById('rt').checked = items.rt;
     document.getElementById('book').checked = items.book;
+    document.getElementById('orcid').checked = items.orcid;
       if(items.rt){
           document.getElementById('make_modal').style.display="block";
       }else{
@@ -66,6 +68,9 @@ function restoreSettings() {
       }else{
           document.getElementById('get_book').style.display="none";
       }
+      if(items.orcid){
+          chrome.runtime.sendMessage({message: "start_orcid"}, function(response) {});
+      }
   });
 }
 
@@ -73,6 +78,7 @@ function saveSettings(){
     var ts = document.getElementById('ts').checked;
     var rt = document.getElementById('rt').checked;
     var book = document.getElementById('book').checked;
+    var orcid= document.getElementById('orcid').checked;
     if(ts){
         chrome.runtime.sendMessage({message: "start_ts"}, function(response) {});
     }
@@ -82,11 +88,15 @@ function saveSettings(){
     if(book){
         document.getElementById('get_book').style.display="block";
     }
+    if(orcid){
+        chrome.runtime.sendMessage({message: "start_orcid"}, function(response) {});
+    }
     chrome.storage.sync.set({
     
     ts: ts,
     rt:rt,
-    book:book
+    book:book,
+    orcid:orcid
   });
 }
 
@@ -95,7 +105,149 @@ function getBooks(){
 	});
 }
 
+function pasteSelection() {
+    
+    chrome.tabs.query({active: true,currentWindow: true}, function (tabs) {
+
+    
+
+            
+            chrome.tabs.sendMessage(tabs[0].id,{method: "getSelection"});
+        
+    });
+}
+
+chrome.runtime.onMessage.addListener(function (response, sender) {
+      var xhr = new XMLHttpRequest();
+  
+  xhr.open("GET","https://pub.orcid.org/v2.0/search?q="+response.text, true);
+
+  xhr.onload = function() {
+      var dispArea=document.getElementById('disp');
+      dispArea.innerHTML="Searching...";
+
+    
+var xmlDoc = xhr.responseXML;
+    
+    function nsResolver(prefix) {
+  var ns = {
+    'search' : 'http://www.orcid.org/ns/search',
+    'common': 'http://www.orcid.org/ns/common'
+  };
+  return ns[prefix] || null;
+}
+      
+      
+      
+      
+
+      
+      
+      
+var eventNodeList = xmlDoc.evaluate('/search:search//search:result/common:orcid-identifier/common:path',xmlDoc, nsResolver, XPathResult.ANY_TYPE, null );  
+      var idArr=[];
+
+
+var currentEvent = eventNodeList.iterateNext();  
+while (currentEvent) {  
+
+    idArr.push(currentEvent.innerHTML);
+    currentEvent = eventNodeList.iterateNext();  
+}
+
+function makereq(elem,id,xhr){
+    xhr.open('GET','https://pub.orcid.org/v2.0/'+id+'/record',true);
+    xhr.setRequestHeader('Content-Type','application/json');
+    xhr.onload=function(){
+        var xmldoc=xhr.response;
+        console.log(xmldoc);
+    };
+    xhr.send(null);
+}
+      
+dispArea.innerHTML="";      
+if(idArr.length!=0){
+      //var list=document.createElement('ul');
+    var linkToPage=document.createElement('a');
+        linkToPage.setAttribute('href','https://orcid.org/orcid-search/quick-search?searchQuery='+response.text);
+        linkToPage.innerHTML="Go to ORCID search";
+        linkToPage.addEventListener('click',function(event){
+            window.open(event.target.href, "", "width=750,height=1000");
+        });
+    var divBeforeList=document.createElement('div');
+    divBeforeList.innerHTML="Top 10 results from ORCID search are :";
+        dispArea.appendChild(linkToPage);
+        dispArea.appendChild(divBeforeList);
+      var len=idArr.length;
+      if(len>10){
+          len=10;
+      }
+        for(var i=0;i<len;i++){
+            //var newxhr=new XMLHttpRequest();
+            //makereq(idArr[i]);
+            //newxhr.open('GET','https://pub.orcid.org/v2.0/'+idArr[i]+'/record',true);
+            //newxhr.setRequestHeader();
+            //newxhr.onload=function(){
+                
+            //};
+            //newxhr.send(null);
+            //var listElem=document.createElement('li');
+            var listElem=document.createElement('a');
+            listElem.setAttribute('class','list-group-item');
+            var url="http://orcid.org/"+idArr[i];
+            //listElem.innerHTML="<a href='#' id="+url+">"+ idArr[i]+"</a>";
+            listElem.innerHTML=idArr[i];
+            listElem.setAttribute('href','#');
+            listElem.setAttribute('id',url);
+            
+            listElem.addEventListener('click',function(event){
+                    var id=event.target.id;
+                    //chrome.tabs.create({url:id});
+                    //window.open(id,'_blank');
+                    if(document.getElementsByClassName('active').length!=0){
+                      document.getElementsByClassName('active')[0].classList.remove('active');  
+                    } 
+                    event.target.classList.add('active');
+                    window.open(id, "", "width=750,height=1000");
+                });
+            //list.appendChild(listElem);
+            dispArea.appendChild(listElem);
+            //var newxhr=new XMLHttpRequest();
+            //makereq(listElem,idArr[i],newxhr);
+        }
+        
+    }else{
+      dispArea.innerHTML="Not found";
+  }
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+  };
+  xhr.send(null);
+    
+    
+});
+
+
+
+
+
+
+
 restoreSettings();
+
 document.getElementById('settings_div').style.display="none";
 
 
@@ -108,4 +260,4 @@ document.getElementById('settings_btn').onclick=showSettings;
 document.getElementById('settings_save_btn').onclick=saveSettings;
 document.getElementById('get_book').onclick = getBooks;
 
-
+window.onload=pasteSelection;
