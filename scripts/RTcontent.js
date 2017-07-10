@@ -1,4 +1,4 @@
-alert("Hey RT here");
+
 if(document.getElementById('myModal')!=null){
     document.getElementById('myModal').style.display="block";
 }else{
