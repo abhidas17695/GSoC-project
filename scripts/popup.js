@@ -1,3 +1,4 @@
+
 function save_now_function(){
 	var wb_url = "https://web.archive.org/save/";
 	chrome.runtime.sendMessage({message: "openurl", wayback_url: wb_url, method:'save' }, function(response) {
@@ -42,7 +43,7 @@ function showSettings(eventObj){
 }
 
 function restoreSettings() {
-  
+  //count=0;
   chrome.storage.sync.get({
     
     ts:true,
@@ -105,26 +106,19 @@ function getBooks(){
 	});
 }
 
-function pasteSelection() {
-    
-    chrome.tabs.query({active: true,currentWindow: true}, function (tabs) {
-
-    
-
-            
-            chrome.tabs.sendMessage(tabs[0].id,{method: "getSelection"});
-        
-    });
-}
-
-chrome.runtime.onMessage.addListener(function (response, sender) {
+function dispORCID(response){
+          if(response.text!=undefined){
+              console.log('Text received');
+      document.getElementsByClassName('loader')[0].style.display='block';
+      //.log('message received');
       var xhr = new XMLHttpRequest();
-  
+      //.log(xhr);
   xhr.open("GET","https://pub.orcid.org/v2.0/search?q="+response.text, true);
 
   xhr.onload = function() {
+      //.log('Loaded');
       var dispArea=document.getElementById('disp');
-      dispArea.innerHTML="Searching...";
+      //dispArea.innerHTML="Searching...";
 
     
 var xmlDoc = xhr.responseXML;
@@ -155,17 +149,9 @@ while (currentEvent) {
     currentEvent = eventNodeList.iterateNext();  
 }
 
-function makereq(elem,id,xhr){
-    xhr.open('GET','https://pub.orcid.org/v2.0/'+id+'/record',true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.onload=function(){
-        var xmldoc=xhr.response;
-        console.log(xmldoc);
-    };
-    xhr.send(null);
-}
+document.getElementsByClassName('loader')[0].style.display='none';
       
-dispArea.innerHTML="";      
+//dispArea.innerHTML="";      
 if(idArr.length!=0){
       //var list=document.createElement('ul');
     var linkToPage=document.createElement('a');
@@ -236,9 +222,26 @@ if(idArr.length!=0){
       
   };
   xhr.send(null);
+      
+}
+}
+
+function pasteSelection() {
+    //.log('Pasted');
+    chrome.tabs.query({active: true,currentWindow: true}, function (tabs) {
+
     
-    
-});
+
+            //.log('Message sent');
+            chrome.tabs.sendMessage(tabs[0].id,{method: "getSelectionfororcid"},function(response){
+                //.log(response);
+                dispORCID(response);
+            });
+            //.log('Yup done');
+    });
+}
+
+
 
 
 
@@ -261,3 +264,4 @@ document.getElementById('settings_save_btn').onclick=saveSettings;
 document.getElementById('get_book').onclick = getBooks;
 
 window.onload=pasteSelection;
+
