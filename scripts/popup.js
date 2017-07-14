@@ -241,7 +241,36 @@ function pasteSelection() {
     });
 }
 
-
+function getRobustLink(eventObj){
+    document.getElementsByClassName('loader')[0].style.display='block';
+    var page_url=document.getElementById('url_for_robust').value;
+    var wb_url = "https://web.archive.org/save/";
+              var pattern = /https:\/\/web\.archive\.org\/web\/(.+?)\//g;
+              var url = page_url.replace(pattern, "");
+              var open_url = wb_url+encodeURI(url);
+              console.log(open_url);
+              var xhr=new XMLHttpRequest();
+              xhr.open('GET',open_url,true);
+              xhr.onload=function(){
+                  var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
+                  var newxhr=new XMLHttpRequest();
+                  newxhr.open('GET',wb_avail_url,true);
+                  newxhr.onload=function(){
+                      var res=JSON.parse(newxhr.responseText);
+                      var archived_url=res.archived_snapshots.closest.url;
+                      var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'"></a>';
+                      console.log(robust_link);
+                      var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js">';
+                      document.getElementsByClassName('loader')[0].style.display='none';
+                      document.getElementById('robust_link').innerHTML=robust_link;
+                      document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+                      document.getElementById('robust_div').style.display='block';
+                      
+                  };
+                  newxhr.send();
+              };
+              xhr.send();
+}
 
 
 
@@ -262,6 +291,8 @@ document.getElementById('make_modal').onclick=makeModal;
 document.getElementById('settings_btn').onclick=showSettings;
 document.getElementById('settings_save_btn').onclick=saveSettings;
 document.getElementById('get_book').onclick = getBooks;
+document.getElementById('get_robust_link').onclick=getRobustLink;
+
 
 window.onload=pasteSelection;
 

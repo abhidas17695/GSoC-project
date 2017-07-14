@@ -28,18 +28,22 @@ function dispTooltipText(eventObj){
     if(URL.includes('https')){
         
         if(URL.includes('web-beta.archive.org')){
-            pos=source.indexOf('web-beta.archive.org');
-            URLofElem=source.substring(pos+43);
+            pos=source.indexOf('im_');
+            //URLofElem=source.substring(pos+43);
+            URLofElem=source.substring(pos+4);
             wb_url="https://archive.org/wayback/available?url="+URLofElem+"&timestamp="+ts[0];
         }else{
-            pos=source.indexOf('web.archive.org');
-            URLofElem=source.substring(pos+38);
+            //pos=source.indexOf('web.archive.org');
+            pos=source.indexOf('im_');
+            URLofElem=source.substring(pos+4);
             wb_url="https://archive.org/wayback/available?url="+URLofElem+"&timestamp="+ts[0];
         }
     }else{
         
-        pos=source.indexOf('web.archive.org');
-        URLofElem=source.substring(pos+38);
+        //pos=source.indexOf('web.archive.org');
+        pos=source.indexOf('im_');
+        //URLofElem=source.substring(pos+38);
+        URLofElem=source.substring(pos+4);
         wb_url="http://archive.org/wayback/available?url="+URLofElem+"&timestamp="+ts[0];
     }
     

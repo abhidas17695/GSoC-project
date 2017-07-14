@@ -64,10 +64,25 @@
           <button type="button" class="btn btn-warning" id="get_book" tabindex='-1'>Get books</button>
         </td>
     	</tr>
+        <tr class="spaceUnder" align="center">
+        <td>
+          <input type="text" id="url_for_robust">
+        </td>
+    	</tr>
+        <tr class="spaceUnder" align="center">
+        <td>
+          <button type="button" class="btn btn-warning" id="get_robust_link" tabindex='-1'>Get robust link</button>
+        </td>
+    	</tr>
+        
         
     </table>
     <div class="loader"></div>
     <div id="disp" class="list-group"></div>
+    <div id="robust_div">
+        <span>Copy this HTML and paste it wherever you need to provide the robust link. Don't forget to provide the text you want 'clickable'</span><textarea id="robust_link"></textarea><br>
+        <span>Copy this text and paste inside the 'head' element</span><textarea id="js_and_css_for_robust"></textarea> 
+    </div>
     <div style="margin: 0px; padding: 0px; border: 0px solid rgb(6, 117, 211); font-size: 19px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: 1; font-family: sans-serif; vertical-align: baseline; box-sizing: content-box; overflow: unset; height: 1px; position: relative; width: auto; display: flex; background-color: rgb(9, 150, 248); color: rgb(255, 255, 255); text-align: left; align-items: center; border-radius: 3px; justify-content: center; text-decoration: none;"></div>
   </body>
 </html>
@@ -113,4 +128,15 @@
       max-height:100%;
       vertical-align: middle;
   }
+    
+    #robust_div{
+        display: none;
+        font-size: 12px;
+    }  
+    textarea{
+        width: 100%;
+        height:80px;
+
+    }
+    
 </style>
