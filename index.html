@@ -79,7 +79,9 @@
     </table>
     <div class="loader"></div>
     <div id="disp" class="list-group"></div>
+    <span id="robust_error"></span>
     <div id="robust_div">
+        
         <span>Copy this HTML and paste it wherever you need to provide the robust link. Don't forget to provide the text you want 'clickable'</span><textarea id="robust_link"></textarea><br>
         <span>Copy this text and paste inside the 'head' element</span><textarea id="js_and_css_for_robust"></textarea> 
     </div>
@@ -133,10 +135,14 @@
         display: none;
         font-size: 12px;
     }  
-    textarea{
+    #robust_link{
         width: 100%;
         height:80px;
 
+    }
+    #js_and_css_for_robust{
+        width: 100%;
+        height:120px;
     }
     
 </style>

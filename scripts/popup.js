@@ -243,33 +243,67 @@ function pasteSelection() {
 
 function getRobustLink(eventObj){
     document.getElementsByClassName('loader')[0].style.display='block';
+    document.getElementById('robust_error').innerHTML="";
+     document.getElementById('robust_div').style.display='none';
     var page_url=document.getElementById('url_for_robust').value;
-    var wb_url = "https://web.archive.org/save/";
-              var pattern = /https:\/\/web\.archive\.org\/web\/(.+?)\//g;
-              var url = page_url.replace(pattern, "");
-              var open_url = wb_url+encodeURI(url);
-              console.log(open_url);
-              var xhr=new XMLHttpRequest();
-              xhr.open('GET',open_url,true);
-              xhr.onload=function(){
-                  var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
-                  var newxhr=new XMLHttpRequest();
-                  newxhr.open('GET',wb_avail_url,true);
-                  newxhr.onload=function(){
-                      var res=JSON.parse(newxhr.responseText);
-                      var archived_url=res.archived_snapshots.closest.url;
-                      var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'"></a>';
-                      console.log(robust_link);
-                      var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js">';
-                      document.getElementsByClassName('loader')[0].style.display='none';
-                      document.getElementById('robust_link').innerHTML=robust_link;
-                      document.getElementById('js_and_css_for_robust').innerHTML=js_css;
-                      document.getElementById('robust_div').style.display='block';
-                      
-                  };
-                  newxhr.send();
-              };
-              xhr.send();
+    if(page_url==""){
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        var pos=tabs[0].url.indexOf('/http');
+        var url=tabs[0].url.substring(pos+1);
+        page_url=url;
+        archived_url=tabs[0].url;
+        var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'"></a>';
+        console.log(robust_link);
+        var js_css='<link rel="stylesheet" tyhref="http://robustlinks.mementoweb.org/tools/js/robustlinks.ctype="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robust</script><script type="texsrc="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js">';
+        document.getElementsByClassName('loader')[0].style.display='none';
+        document.getElementById('robust_link').innerHTML=robust_link;
+        document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+        document.getElementById('robust_div').style.display='block';
+            });
+    }else{
+         
+         
+         var wb_url = "https://web.archive.org/save/";
+         var pattern = /https:\/\/web\.archive\.org\/web\/(.+?)\//g;
+         var url = page_url.replace(pattern, "");
+         var open_url = wb_url+encodeURI(url);
+         if(!page_url.includes('http')){
+             page_url="http://"+page_url;
+         }
+         var xhr=new XMLHttpRequest();
+         xhr.open('GET',open_url,true);
+         xhr.onload=function(){
+         if(xhr.status==200){
+         var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
+         var newxhr=new XMLHttpRequest();
+         newxhr.open('GET',wb_avail_url,true);
+         newxhr.onload=function(){
+         var res=JSON.parse(newxhr.responseText);
+         if(res.archived_snapshots.closest!=undefined){
+         var archived_url=res.archived_snapshots.closest.url;
+         var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'"></a>';
+         console.log(robust_link);
+         var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
+         document.getElementsByClassName('loader')[0].style.display='none';
+         document.getElementById('robust_link').innerHTML=robust_link;
+         document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+         document.getElementById('robust_div').style.display='block';
+         }else{
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="Please enter a valid URL";
+             
+         }
+        };
+        newxhr.send();
+         }else{
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="Please enter a valid URL";
+         }
+        };
+        xhr.send();
+    
+    
+}
 }
 
 
