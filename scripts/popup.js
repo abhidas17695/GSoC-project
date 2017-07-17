@@ -251,6 +251,7 @@ function getRobustLink(eventObj){
         var pos=tabs[0].url.indexOf('/http');
         var url=tabs[0].url.substring(pos+1);
         page_url=url;
+        if(tabs[0].url.indexOf('web.archive.org/web')>=0){
         archived_url=tabs[0].url;
         var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'"></a>';
         console.log(robust_link);
@@ -259,6 +260,11 @@ function getRobustLink(eventObj){
         document.getElementById('robust_link').innerHTML=robust_link;
         document.getElementById('js_and_css_for_robust').innerHTML=js_css;
         document.getElementById('robust_div').style.display='block';
+        }else{
+            
+            document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="Please enter a valid URL";
+        }
             });
     }else{
          
