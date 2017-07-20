@@ -49,13 +49,15 @@ function restoreSettings() {
     ts:true,
     rt:true,
     book:true,
-    orcid:true
+    orcid:true,
+    robust:true
   }, function(items) {
     
     document.getElementById('ts').checked = items.ts;
     document.getElementById('rt').checked = items.rt;
     document.getElementById('book').checked = items.book;
     document.getElementById('orcid').checked = items.orcid;
+    document.getElementById('robust').checked = items.robust;  
       if(items.rt){
           document.getElementById('make_modal').style.display="block";
       }else{
@@ -72,6 +74,12 @@ function restoreSettings() {
       if(items.orcid){
           chrome.runtime.sendMessage({message: "start_orcid"}, function(response) {});
       }
+      if(items.robust){
+          document.getElementById('get_robust_link').style.display="block";
+      }else{
+          document.getElementById('get_robust_link').style.display="none";
+      }
+      
   });
 }
 
@@ -80,6 +88,7 @@ function saveSettings(){
     var rt = document.getElementById('rt').checked;
     var book = document.getElementById('book').checked;
     var orcid= document.getElementById('orcid').checked;
+    var robust= document.getElementById('robust').checked;
     if(ts){
         chrome.runtime.sendMessage({message: "start_ts"}, function(response) {});
     }
@@ -92,12 +101,16 @@ function saveSettings(){
     if(orcid){
         chrome.runtime.sendMessage({message: "start_orcid"}, function(response) {});
     }
+    if(robust){
+        document.getElementById('get_robust_link').style.display="block";
+    }
     chrome.storage.sync.set({
     
     ts: ts,
     rt:rt,
     book:book,
-    orcid:orcid
+    orcid:orcid,
+    robust:robust
   });
 }
 
@@ -235,45 +248,45 @@ function pasteSelection() {
             //.log('Message sent');
             chrome.tabs.sendMessage(tabs[0].id,{method: "getSelectionfororcid"},function(response){
                 //.log(response);
-                dispORCID(response);
+                if(response!=undefined){
+                    dispORCID(response);
+                }
+                
             });
             //.log('Yup done');
     });
 }
 
+function display_robust_link(page_url,archived_url,title){
+    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
+        var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
+         document.getElementsByClassName('loader')[0].style.display='none';
+         document.getElementById('robust_link').innerHTML=robust_link;
+         document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+         document.getElementById('robust_div').style.display='block';
+
+}
+
 function getRobustLink(eventObj){
     document.getElementsByClassName('loader')[0].style.display='block';
     document.getElementById('robust_error').innerHTML="";
-     document.getElementById('robust_div').style.display='none';
+    document.getElementById('robust_div').style.display='none';
     
-    //var page_url=document.getElementById('url_for_robust').value;
-    //if(page_url==""){
+
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        //var page_url=tabs[0].url;
-//        var pos=tabs[0].url.indexOf('/http');
-//        var url=tabs[0].url.substring(pos+1);
-//        page_url=url;
+        var archived_url="";
+        var page_url="";
+        var robust_link="";
         if(tabs[0].url.indexOf('web.archive.org/web')>=0){
-        var archived_url=tabs[0].url;
+        archived_url=tabs[0].url;
         var pos=tabs[0].url.indexOf('/http');
         var url=tabs[0].url.substring(pos+1);
-        var page_url=url;
-        var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+tabs[0].title+'</a>';
+        page_url=url;
+        display_robust_link(page_url,archived_url,tabs[0].title);
         
-        var js_css='<link rel="stylesheet" tyhref="http://robustlinks.mementoweb.org/tools/js/robustlinks.ctype="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robust</script><script type="texsrc="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js">';
-        document.getElementsByClassName('loader')[0].style.display='none';
-        document.getElementById('robust_link').innerHTML=robust_link;
-        document.getElementById('js_and_css_for_robust').innerHTML=js_css;
-        document.getElementById('robust_div').style.display='block';
         }else{
-            
-//            document.getElementsByClassName('loader')[0].style.display='none';
-//             document.getElementById('robust_error').innerHTML="Please enter a valid URL";
-//        }
-//            });
-    //}else{
-         
-         var page_url=tabs[0].url;
+        console.log('Normal page');
+         page_url=tabs[0].url;
          var wb_url = "https://web.archive.org/save/";
          var pattern = /https:\/\/web\.archive\.org\/web\/(.+?)\//g;
          var url = page_url.replace(pattern, "");
@@ -283,22 +296,20 @@ function getRobustLink(eventObj){
          }
          var xhr=new XMLHttpRequest();
          xhr.open('GET',open_url,true);
+         console.log(open_url);
          xhr.onload=function(){
          if(xhr.status==200){
          var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
          var newxhr=new XMLHttpRequest();
          newxhr.open('GET',wb_avail_url,true);
+         console.log("SPN over");
          newxhr.onload=function(){
          var res=JSON.parse(newxhr.responseText);
          if(res.archived_snapshots.closest!=undefined){
-         var archived_url=res.archived_snapshots.closest.url;
-         var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+tabs[0].title+'</a>';
-         console.log(robust_link);
-         var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
-         document.getElementsByClassName('loader')[0].style.display='none';
-         document.getElementById('robust_link').innerHTML=robust_link;
-         document.getElementById('js_and_css_for_robust').innerHTML=js_css;
-         document.getElementById('robust_div').style.display='block';
+         archived_url=res.archived_snapshots.closest.url;
+         console.log(archived_url);
+         display_robust_link(page_url,archived_url,tabs[0].title);
+
          }else{
              document.getElementsByClassName('loader')[0].style.display='none';
              document.getElementById('robust_error').innerHTML="There was an error. Please try again";
@@ -307,25 +318,13 @@ function getRobustLink(eventObj){
         };
         newxhr.send();
          }else{
-             
-             //document.getElementById('robust_error').innerHTML="Please enter a valid URL";
-             var archived_url="http://web.archive.org/";
-             var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+tabs[0].title+'</a>';
-            console.log(robust_link);
-            var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
-            document.getElementsByClassName('loader')[0].style.display='none';
-            document.getElementById('robust_link').innerHTML=robust_link;
-            document.getElementById('js_and_css_for_robust').innerHTML=js_css;
-            document.getElementById('robust_div').style.display='block';
+             archived_url="http://web.archive.org/";
+             display_robust_link(page_url,archived_url,tabs[0].title);
          }
         };
         xhr.send();
                 }
             });
-
-    
-    
-//}
 }
 
 

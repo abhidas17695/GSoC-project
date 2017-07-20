@@ -501,7 +501,8 @@ function restoreSettings() {
             ts:true,
             rt:true,
             book:true,
-            orcid:true
+            orcid:true,
+            robust:true
           });
 }
 
