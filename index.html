@@ -76,6 +76,15 @@
     <div class="loader"></div>
     <div id="disp" class="list-group"></div>
     <span id="robust_error"></span>
+    <div id="robust_question_div">
+        <span id="robust_question"></span><br>
+        <div class="container">
+        <div class="row">
+        <button id="robust_yes" class="col-xs-6 btn btn-success btn-sm">Yes</button>
+        <button id="robust_no" class="col-xs-6 btn btn-danger btn-sm">No</button>
+        </div>
+        </div>
+    </div>
     <div id="robust_div">
         
         <span>Copy this HTML and paste it wherever you need to provide the robust link. Don't forget to provide the text you want 'clickable'</span><textarea id="robust_link"></textarea><br>
@@ -139,6 +148,10 @@
     #js_and_css_for_robust{
         width: 100%;
         height:120px;
+    }
+    #robust_question_div{
+        width: 100%;
+        display: none;
     }
     
 </style>

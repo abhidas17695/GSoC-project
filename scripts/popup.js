@@ -121,7 +121,7 @@ function getBooks(){
 
 function dispORCID(response){
           if(response.text!=undefined){
-              console.log('Text received');
+              //console.log('Text received');
       document.getElementsByClassName('loader')[0].style.display='block';
       //.log('message received');
       var xhr = new XMLHttpRequest();
@@ -267,6 +267,69 @@ function display_robust_link(page_url,archived_url,title){
 
 }
 
+function wb_availability(page_url,code,title){
+         var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
+         var newxhr=new XMLHttpRequest();
+         newxhr.open('GET',wb_avail_url,true);
+         //console.log("SPN over");
+         newxhr.onerror=function(){
+             console.log('Unknown error');
+         };
+         newxhr.onload=function(){
+         if(newxhr.status==200){
+         var res=JSON.parse(newxhr.responseText);
+         if(res.archived_snapshots.closest!=undefined && code==200){
+             console.log(code,newxhr.statusText);
+         var archived_url=res.archived_snapshots.closest.url;
+            display_robust_link(page_url,archived_url,title);  
+         
+         }else if(res.archived_snapshots.closest==undefined && code==200){
+             console.log(code,newxhr.statusText);
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="There was an error in retrieving the playback URL. PLease try again";
+             
+         }else if(res.archived_snapshots.closest!=undefined && code==502){
+                 console.log(code,newxhr.statusText);
+                 var archived_url=res.archived_snapshots.closest.url;
+                 document.getElementsByClassName('loader')[0].style.display='none';
+                 var timestamp=archived_url.match(/\d{14}/g)[0];
+                 var year=timestamp.substring(0,4);
+                 var month=timestamp.substring(4,6);
+                 var day=timestamp.substring(6,8);
+                 //console.log(timestamp);
+                 document.getElementById('robust_question_div').style.display='block';
+                 document.getElementById('robust_question').innerHTML="We cannot save the page right now. Would you like a robust link to the most recent snapshot dated "+day+":"+month+":"+year+" ?";
+                 document.getElementById('robust_yes').setAttribute('archurl',archived_url);
+                 document.getElementById('robust_yes').setAttribute('url',page_url);
+                 document.getElementById('robust_yes').setAttribute('title',title);
+                 document.getElementById('robust_yes').onclick=function(eventObj){
+                     document.getElementById('robust_question_div').style.display='none';
+                     var page_url=eventObj.target.getAttribute('url');
+                     var archived_url=eventObj.target.getAttribute('archurl');
+                     var title=eventObj.target.getAttribute('title');
+                     display_robust_link(page_url,archived_url,title);
+                 };
+                 document.getElementById('robust_no').onclick=function(eventObj){
+                     document.getElementsByClassName('loader')[0].style.display='none';
+                     document.getElementById('robust_question_div').style.display='none';
+                 };
+
+         }else if(res.archived_snapshots.closest==undefined && code==502){
+                 console.log(code,newxhr.statusText);
+                 document.getElementsByClassName('loader')[0].style.display='none';
+                 document.getElementById('robust_error').innerHTML="We cannot save this page right now . We do not have a playback for it either";
+
+         }
+         }else{
+             console.log(newxhr.status,newxhr.statusText);
+             
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="Unknown error";
+         }
+        };
+        newxhr.send();
+}
+
 function getRobustLink(eventObj){
     document.getElementsByClassName('loader')[0].style.display='block';
     document.getElementById('robust_error').innerHTML="";
@@ -285,7 +348,7 @@ function getRobustLink(eventObj){
         display_robust_link(page_url,archived_url,tabs[0].title);
         
         }else{
-        console.log('Normal page');
+        //console.log('Normal page');
          page_url=tabs[0].url;
          var wb_url = "https://web.archive.org/save/";
          var pattern = /https:\/\/web\.archive\.org\/web\/(.+?)\//g;
@@ -296,30 +359,89 @@ function getRobustLink(eventObj){
          }
          var xhr=new XMLHttpRequest();
          xhr.open('GET',open_url,true);
-         console.log(open_url);
+         //console.log(open_url);
          xhr.onload=function(){
          if(xhr.status==200){
-         var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
-         var newxhr=new XMLHttpRequest();
-         newxhr.open('GET',wb_avail_url,true);
-         console.log("SPN over");
-         newxhr.onload=function(){
-         var res=JSON.parse(newxhr.responseText);
-         if(res.archived_snapshots.closest!=undefined){
-         archived_url=res.archived_snapshots.closest.url;
-         console.log(archived_url);
-         display_robust_link(page_url,archived_url,tabs[0].title);
-
-         }else{
-             document.getElementsByClassName('loader')[0].style.display='none';
-             document.getElementById('robust_error').innerHTML="There was an error. Please try again";
+//         var wb_avail_url="https://archive.org/wayback/available?url="+page_url;
+//         var newxhr=new XMLHttpRequest();
+//         newxhr.open('GET',wb_avail_url,true);
+//         console.log("SPN over");
+//         newxhr.onload=function(){
+//         var res=JSON.parse(newxhr.responseText);
+//         if(res.archived_snapshots.closest!=undefined){
+//         archived_url=res.archived_snapshots.closest.url;
+//         console.log(archived_url);
+//         display_robust_link(page_url,archived_url,tabs[0].title);
+//
+//         }else{
+//             document.getElementsByClassName('loader')[0].style.display='none';
+//             document.getElementById('robust_error').innerHTML="There was an error. Please try again";
+//             
+//         }
+//        };
+//        newxhr.send();
+          
              
-         }
-        };
-        newxhr.send();
+//          archived_url=wb_availability(page_url);
+//          console.log(archived_url);
+//          if(archived_url==null){
+//             document.getElementsByClassName('loader')[0].style.display='none';
+//             document.getElementById('robust_error').innerHTML="There was an error in retrieving the playback URL. PLease try again";
+//
+//          }else{
+//            display_robust_link(page_url,archived_url,tabs[0].title);    
+//          }
+          wb_availability(page_url,200,tabs[0].title);
+         }else if(xhr.status==502){
+             //cant be saved now
+//             archived_url=wb_availability(page_url);
+//             if(archived_url==null){
+//                 document.getElementsByClassName('loader')[0].style.display='none';
+//                 document.getElementById('robust_error').innerHTML="We cannot save this page right now . We do not have a playback for it either";
+//             }else{
+//                 document.getElementsByClassName('loader')[0].style.display='none';
+//                 var timestamp=archived_url.match(/\d{5}/g)[0];
+//                 var year=timestamp.substring(0,4);
+//                 var month=timestamp.substring(4,6);
+//                 var day=timestamp.substring(6,8);
+//                 document.getElementById('robust_question_div').style.display='block';
+//                 document.getElementById('robust_question').innerHTML="We cannot save the page right now. Would you like a robust link to the most recent snapshot dated "+day+":"+month+":"+year+" ?";
+//                 document.getElementById('robust_yes').setAttribute('archurl',archived_url);
+//                 document.getElementById('robust_yes').setAttribute('url',page_url);
+//                 document.getElementById('robust_yes').setAttribute('title',tabs[0].title);
+//                 document.getElementById('robust_yes').onclick=function(eventObj){
+//                     document.getElementById('robust_question_div').style.display='none';
+//                     var page_url=eventObj.target.getAttribute('url');
+//                     var archived_url=eventObj.target.getAttribute('archurl');
+//                     var title=eventObj.target.getAttribute('title');
+//                     display_robust_link(page_url,archived_url,title);
+//                 };
+//                 document.getElementById('robust_no').onclick=function(eventObj){
+//                     document.getElementsByClassName('loader')[0].style.display='none';
+//                     document.getElementById('robust_question_div').style.display='none';
+//                 };
+//             }
+             wb_availability(page_url,502,tabs[0].title);
+         }else if(xhr.status==403){
+             //blocked from being saved
+             console.log(403,xhr.statusText);
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="This URL has been excluded from the Wayback Machine.";
+         }else if(xhr.status==503){
+             //server unavailable
+             console.log(503,xhr.statusText);
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="The server responded with 503 error(Service Unavailable). Please try again";
+         }else if(xhr.status==504){
+             //server unavailable
+             console.log(504,xhr.statusText);
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="The server responded with 504 error(Gateway timeout). Please try again";
          }else{
-             archived_url="http://web.archive.org/";
-             display_robust_link(page_url,archived_url,tabs[0].title);
+             //server unavailable
+             console.log(xhr.status,xhr.statusText);
+             document.getElementsByClassName('loader')[0].style.display='none';
+             document.getElementById('robust_error').innerHTML="Unknown error";
          }
         };
         xhr.send();
