@@ -3,7 +3,7 @@ bookstyle.rel = 'stylesheet';
 bookstyle.type = 'text/css';
 bookstyle.href = chrome.extension.getURL('css/bookstyle.css');
 document.head.appendChild(bookstyle);
-
+progressBar=true;
 var myProgess=document.createElement('div');
 myProgess.setAttribute('id','myProgress');
 var myBar=document.createElement('div');
@@ -18,9 +18,13 @@ function updateProgress(percent,myProgress,myBar){
     var width = percent;
     elem.style.width = width + '%'; 
     elem.innerHTML = width * 1  + '%';
-    if(count>=totalNum && percent<=100){
+    if(count>=totalNum && progressBar==true){
+        progressBar=false;
+        console.log(count,totalNum,percent);
         myBar.innerHTML="Complete !";
-        setTimeout(function(){document.body.removeChild(myProgress);},1000);
+        setTimeout(function(){
+            document.body.removeChild(myProgress);
+        },1000);
     }
     
     
@@ -201,7 +205,12 @@ function makeReqforBookNames(xhr,text,elem,alert){
             if(!(elem instanceof Selection)){
                 count++;
             percent=Math.floor((count/totalNum)*100);
-            updateProgress(percent,myProgess,myBar);
+                if(progressBar==true){
+                    updateProgress(percent,myProgess,myBar);
+                }
+                
+            
+            
             }
         }
             catch(e){
