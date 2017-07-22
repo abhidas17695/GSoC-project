@@ -258,12 +258,18 @@ function pasteSelection() {
 }
 
 function display_robust_link(page_url,archived_url,title){
-    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
-        var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
-         document.getElementsByClassName('loader')[0].style.display='none';
-         document.getElementById('robust_link').innerHTML=robust_link;
-         document.getElementById('js_and_css_for_robust').innerHTML=js_css;
-         document.getElementById('robust_div').style.display='block';
+    var timestamp=archived_url.match(/\d{14}/g)[0];
+    var year=timestamp.substring(0,4);
+    var month=timestamp.substring(4,6);
+    var day=timestamp.substring(6,8);
+
+//    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
+    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+title+'</a>';
+    var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
+    document.getElementsByClassName('loader')[0].style.display='none';
+    document.getElementById('robust_link').innerHTML=robust_link;
+    document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+    document.getElementById('robust_div').style.display='block';
 
 }
 
@@ -341,11 +347,30 @@ function getRobustLink(eventObj){
         var page_url="";
         var robust_link="";
         if(tabs[0].url.indexOf('web.archive.org/web')>=0){
+//        archived_url=tabs[0].url;
+//        var pos=tabs[0].url.indexOf('/http');
+//        var url=tabs[0].url.substring(pos+1);
+//        page_url=url;
+//        display_robust_link(page_url,archived_url,tabs[0].title);
         archived_url=tabs[0].url;
         var pos=tabs[0].url.indexOf('/http');
         var url=tabs[0].url.substring(pos+1);
         page_url=url;
-        display_robust_link(page_url,archived_url,tabs[0].title);
+        
+        var timestamp=archived_url.match(/\d{14}/g)[0];
+    var year=timestamp.substring(0,4);
+    var month=timestamp.substring(4,6);
+    var day=timestamp.substring(6,8);
+
+//    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
+    var robust_link='<a href="'+archived_url+'" data-originalurl="'+page_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+tabs[0].title+'</a>';
+    var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
+    document.getElementsByClassName('loader')[0].style.display='none';
+    document.getElementById('robust_link').innerHTML=robust_link;
+    document.getElementById('js_and_css_for_robust').innerHTML=js_css;
+    document.getElementById('robust_div').style.display='block';
+
+          
         
         }else{
         //console.log('Normal page');
