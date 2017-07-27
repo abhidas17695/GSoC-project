@@ -343,7 +343,7 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
             
             
           }
-          var wayback_url="https://web-beta.archive.org/web/"+year+"*"+url;
+          var wayback_url="https://web.archive.org/web/"+year+"*"+url;
           //console.log(url);
           
           chrome.runtime.sendMessage({message:'openurl',url:wayback_url});
