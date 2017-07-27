@@ -1,10 +1,36 @@
 URL="";
 function dispTooltipText(eventObj){
+        function showTooltip(){
+      console.log('showing');
+          $( document ).tooltip({
+      position: {
+        my: "center bottom-20",
+        at: "center top",
+        collision: "none",
+        using: function( position, feedback ) {
+          $( this ).css( position );
+          $( "<div>" )
+            .addClass( "arrow" )
+            .addClass( feedback.vertical )
+            .addClass( feedback.horizontal )
+            .appendTo( this );
+        }
+      }
+    });
+}
+    //console.log($( document ).tooltip);
+    $( document ).tooltip('close')
+    //$( document ).tooltip();
+    //$("[data-toggle='tooltip']").tooltip('close');
   var target=eventObj.target;
   console.log(target);
   if(target.getAttribute('count')=='1'){
-    $("[data-toggle='tooltip']").tooltip('hide');
-    $(target).tooltip('show');    
+          showTooltip();
+      $(target).tooltip();
+      
+      $(target).tooltip('close').tooltip('open');
+    //$("[data-toggle='tooltip']").tooltip('hide');
+    //$(target).tooltip('show');    
     return;
   }
   var source;    
@@ -18,7 +44,13 @@ function dispTooltipText(eventObj){
   var text;
   if(ts==null || ts[0]==null || ts[0].length!=14){
     text="Time stamp not found !";
-    target.setAttribute('data-original-title',text);
+    //target.setAttribute('data-original-title',text);
+    target.setAttribute('title',text);
+    showTooltip();
+    $(target).tooltip();
+    
+    $(target).tooltip('close').tooltip('open');
+      target.setAttribute('count','1');
     return;
   }else{
     var pos;
@@ -51,8 +83,26 @@ function dispTooltipText(eventObj){
     console.log(pos);
     xhr.open("GET",wb_url,true);
     xhr.onload=function(){
-      var text;
-      var res=JSON.parse(xhr.responseText);
+          if(xhr.status==503){
+          var text="Server not available";
+          target.setAttribute('title',text);
+          showTooltip();
+           $(target).tooltip();
+           
+    $(target).tooltip('close').tooltip('open');
+          return;
+      }else{
+    var text;
+    var res=JSON.parse(xhr.responseText);
+    if(res.archived_snapshots.closest==undefined){
+          var text="Server not available";
+          target.setAttribute('title',text); 
+           showTooltip();
+           $(target).tooltip();
+           
+    $(target).tooltip('close').tooltip('open');
+          return;
+      }else{
       if(res.archived_snapshots.closest.available==true){
         var newts=res.archived_snapshots.closest.timestamp;
         var year=newts.slice(0,4);
@@ -100,22 +150,46 @@ function dispTooltipText(eventObj){
           break;
         }
         text=month+" "+day+" "+year+" "+" "+hour+":"+min+":"+sec;
-        target.setAttribute('data-original-title',text);
+        target.setAttribute('title',text);
+        showTooltip();
+        $(target).tooltip();
+        $(target).tooltip('close').tooltip('open');
+          
+        
+        //target.setAttribute('data-original-title',text);
         target.setAttribute('count','1');
-        $("[data-toggle='tooltip']").tooltip('hide');
-        $(target).tooltip('show');    
+        //$("[data-toggle='tooltip']").tooltip('hide');
+        //$(target).tooltip('show');    
         return;
+      }
+      }
       }
     };
     xhr.send(null);
   }
 }
 $(document).ready(function(){
-  var boot = document.createElement('link');
-  boot.rel = 'stylesheet';
-  boot.type = 'text/css';
-  boot.href = chrome.extension.getURL('css/bootstrap.css');
-  document.head.appendChild(boot);
+//  var boot = document.createElement('link');
+//  boot.rel = 'stylesheet';
+//  boot.type = 'text/css';
+//  boot.href = chrome.extension.getURL('css/bootstrap.css');
+//  document.head.appendChild(boot);
+      $( document ).tooltip({
+      position: {
+        my: "center bottom-20",
+        at: "center top",
+        collision: "none",
+        using: function( position, feedback ) {
+          $( this ).css( position );
+          $( "<div>" )
+            .addClass( "arrow" )
+            .addClass( feedback.vertical )
+            .addClass( feedback.horizontal )
+            .appendTo( this );
+        }
+      }
+    });
+
   var count=0;
   var body=document.body;
   var ts_elems=['img','iframe'];
@@ -130,7 +204,7 @@ $(document).ready(function(){
       element.setAttribute('data-toggle','tooltip');
       element.removeAttribute('data-original-title');
       element.removeAttribute('alt');
-      element.removeAttribute('title');
+      element.setAttribute('title','');
       element.setAttribute('count','0');   
       element.addEventListener('mouseover',dispTooltipText);
       $(element).on('mouseout',function(){
@@ -138,7 +212,7 @@ $(document).ready(function(){
       });
     }
   }
-  $("body").tooltip({ selector: "[data-toggle='tooltip']",container:'body'});
+  //$("body").tooltip({ selector: "[data-toggle='tooltip']",container:'body'});
     chrome.runtime.sendMessage({message:'sendurl'});
     chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
         if(message.url){

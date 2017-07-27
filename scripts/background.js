@@ -476,15 +476,25 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 
 
       function inject_ts(id){
-          chrome.tabs.executeScript(id, {
+                chrome.tabs.insertCSS(id,{
+                    file:"css/jqueryui.css"
+                });
+                chrome.tabs.executeScript(id, {
                   file:"scripts/jquery.js"
                 });
                 chrome.tabs.executeScript(id, {
-                  file:"scripts/bootstrap.js"
+                  file:"scripts/jqueryui.js"
                 });
+
+                
                 chrome.tabs.executeScript(id, {
                   file:"scripts/TScontent.js"
                 });
+              
+                chrome.tabs.insertCSS(id,{
+                    file:"css/TSstyle.css"
+                });
+
       }
 
 function inject_orcid(id){
