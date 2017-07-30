@@ -263,8 +263,8 @@ function display_robust_link(page_url,archived_url,title){
     var month=timestamp.substring(4,6);
     var day=timestamp.substring(6,8);
 
-//    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
-    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+title+'</a>';
+    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
+//    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+title+'</a>';
     var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
     document.getElementsByClassName('loader')[0].style.display='none';
     document.getElementById('robust_link').innerHTML=robust_link;
@@ -361,9 +361,9 @@ function getRobustLink(eventObj){
     var year=timestamp.substring(0,4);
     var month=timestamp.substring(4,6);
     var day=timestamp.substring(6,8);
-
-//    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
-    var robust_link='<a href="'+archived_url+'" data-originalurl="'+page_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+tabs[0].title+'</a>';
+    var title=tabs[0].title;
+    var robust_link='<a href="'+page_url+'" data-versionurl="'+archived_url+'">'+title+'</a>';
+//    var robust_link='<a href="'+archived_url+'" data-originalurl="'+page_url+'" data-versiondate="'+year+'-'+month+'-'+day+'">'+tabs[0].title+'</a>';
     var js_css='<link rel="stylesheet" type="text/css" href="http://robustlinks.mementoweb.org/tools/js/robustlinks.css" /><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-min.js"></script><script type="text/javascript" src="http://robustlinks.mementoweb.org/tools/js/robustlinks-uri-exclude-list.js"></script>';
     document.getElementsByClassName('loader')[0].style.display='none';
     document.getElementById('robust_link').innerHTML=robust_link;
