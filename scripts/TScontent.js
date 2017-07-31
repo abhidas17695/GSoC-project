@@ -1,14 +1,16 @@
 URL="";
 function dispTooltipText(eventObj){
+        
         function showTooltip(target,text,count){
             var hoverElems=document.querySelectorAll( ":hover" );
             target.setAttribute('title',text);
             if(target==hoverElems[hoverElems.length-1] && target.nodeName=='IMG'){
                 $(target).tooltip();
                 $(target).tooltip('close').tooltip('open');
+                
             }
             target.setAttribute('count',count);
-            
+            target.style.cursor='auto';
 
         }
     //console.log($( document ).tooltip);
@@ -18,8 +20,9 @@ function dispTooltipText(eventObj){
     //$("[data-toggle='tooltip']").blur();
   var target=eventObj.target;
   console.log(target);
+  target.style.cursor='progress';
   if(target.getAttribute('count')=='1'){
-          
+      target.style.cursor='auto';    
       $(target).tooltip();
       
       $(target).tooltip('close').tooltip('open');
