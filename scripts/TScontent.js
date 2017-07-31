@@ -1,31 +1,25 @@
 URL="";
 function dispTooltipText(eventObj){
-        function showTooltip(){
-      console.log('showing');
-          $( document ).tooltip({
-      position: {
-        my: "center bottom-20",
-        at: "center top",
-        collision: "none",
-        using: function( position, feedback ) {
-          $( this ).css( position );
-          $( "<div>" )
-            .addClass( "arrow" )
-            .addClass( feedback.vertical )
-            .addClass( feedback.horizontal )
-            .appendTo( this );
+        function showTooltip(target,text,count){
+            var hoverElems=document.querySelectorAll( ":hover" );
+            target.setAttribute('title',text);
+            if(target==hoverElems[hoverElems.length-1] && target.nodeName=='IMG'){
+                $(target).tooltip();
+                $(target).tooltip('close').tooltip('open');
+            }
+            target.setAttribute('count',count);
+            
+
         }
-      }
-    });
-}
     //console.log($( document ).tooltip);
-    $( document ).tooltip('close')
+    //$( document ).tooltip('close');
     //$( document ).tooltip();
     //$("[data-toggle='tooltip']").tooltip('close');
+    //$("[data-toggle='tooltip']").blur();
   var target=eventObj.target;
   console.log(target);
   if(target.getAttribute('count')=='1'){
-          showTooltip();
+          
       $(target).tooltip();
       
       $(target).tooltip('close').tooltip('open');
@@ -44,13 +38,15 @@ function dispTooltipText(eventObj){
   var text;
   if(ts==null || ts[0]==null || ts[0].length!=14){
     text="Time stamp not found !";
+    showTooltip(target,text,'1');
     //target.setAttribute('data-original-title',text);
-    target.setAttribute('title',text);
-    showTooltip();
-    $(target).tooltip();
     
-    $(target).tooltip('close').tooltip('open');
-      target.setAttribute('count','1');
+//    target.setAttribute('title',text);
+//    showTooltip();
+//    $(target).tooltip();
+//    
+//    $(target).tooltip('close').tooltip('open');
+//      target.setAttribute('count','1');
     return;
   }else{
     var pos;
@@ -86,21 +82,23 @@ function dispTooltipText(eventObj){
           if(xhr.status==503){
           var text="Server not available";
           target.setAttribute('title',text);
-          showTooltip();
-           $(target).tooltip();
+          showTooltip(target,text,'0');
+          //showTooltip();
+           //$(target).tooltip();
            
-    $(target).tooltip('close').tooltip('open');
+    //$(target).tooltip('close').tooltip('open');
           return;
       }else{
     var text;
     var res=JSON.parse(xhr.responseText);
     if(res.archived_snapshots.closest==undefined){
           var text="Server not available";
-          target.setAttribute('title',text); 
-           showTooltip();
-           $(target).tooltip();
+          showTooltip(target,text,'0');
+          //target.setAttribute('title',text); 
+           //showTooltip();
+           //$(target).tooltip();
            
-    $(target).tooltip('close').tooltip('open');
+    //$(target).tooltip('close').tooltip('open');
           return;
       }else{
       if(res.archived_snapshots.closest.available==true){
@@ -150,14 +148,21 @@ function dispTooltipText(eventObj){
           break;
         }
         text=month+" "+day+" "+year+" "+" "+hour+":"+min+":"+sec;
-        target.setAttribute('title',text);
-        showTooltip();
-        $(target).tooltip();
-        $(target).tooltip('close').tooltip('open');
-          
+        showTooltip(target,text,'1');
+        //var hoverElems=document.querySelectorAll( ":hover" );
+
+          //target.setAttribute('title',text);
+//        showTooltip();
+          //$(target).tooltip();
+//        if(target==hoverElems[hoverElems.length-1]){
+//        $(target).tooltip();
+//        $(target).tooltip('close').tooltip('open');
+//        }
+//        $(target).tooltip('close').tooltip('open');
+//          
         
         //target.setAttribute('data-original-title',text);
-        target.setAttribute('count','1');
+        //target.setAttribute('count','1');
         //$("[data-toggle='tooltip']").tooltip('hide');
         //$(target).tooltip('show');    
         return;
@@ -174,21 +179,21 @@ $(document).ready(function(){
 //  boot.type = 'text/css';
 //  boot.href = chrome.extension.getURL('css/bootstrap.css');
 //  document.head.appendChild(boot);
-      $( document ).tooltip({
-      position: {
-        my: "center bottom-20",
-        at: "center top",
-        collision: "none",
-        using: function( position, feedback ) {
-          $( this ).css( position );
-          $( "<div>" )
-            .addClass( "arrow" )
-            .addClass( feedback.vertical )
-            .addClass( feedback.horizontal )
-            .appendTo( this );
-        }
-      }
-    });
+//      $( document ).tooltip({
+//      position: {
+//        my: "center bottom-20",
+//        at: "center top",
+//        collision: "none",
+//        using: function( position, feedback ) {
+//          $( this ).css( position );
+//          $( "<div>" )
+//            .addClass( "arrow" )
+//            .addClass( feedback.vertical )
+//            .addClass( feedback.horizontal )
+//            .appendTo( this );
+//        }
+//      }
+//    });
 
   var count=0;
   var body=document.body;
@@ -204,14 +209,34 @@ $(document).ready(function(){
       element.setAttribute('data-toggle','tooltip');
       element.removeAttribute('data-original-title');
       element.removeAttribute('alt');
+      //element.removeAttribute('title');
       element.setAttribute('title','');
+      element.setAttribute('tooltip','');
       element.setAttribute('count','0');   
       element.addEventListener('mouseover',dispTooltipText);
       $(element).on('mouseout',function(){
-        $(this).blur();
+      $(this).blur();
+        $("[data-toggle='tooltip']").blur();
       });
     }
   }
+    
+      $("[data-toggle='tooltip']").tooltip({
+      items: "img",
+      position: {
+        my: "center bottom-20",
+        at: "center top",
+        using: function( position, feedback ) {
+          $( this ).css( position );
+          $( "<div>" )
+            .addClass( "arrow" )
+            .addClass( feedback.vertical )
+            .addClass( feedback.horizontal )
+            .appendTo( this );
+        }
+      }
+    });
+
   //$("body").tooltip({ selector: "[data-toggle='tooltip']",container:'body'});
     chrome.runtime.sendMessage({message:'sendurl'});
     chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
