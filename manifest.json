@@ -4,7 +4,12 @@
   "description": "Reduce annoying 404 pages by automatically checking for an archived copy in the Wayback Machine.",
   "version": "1.4.5",
   "homepage_url": "https://archive.org/",
-  
+  "icons": { 
+        "16":"images/icon.png", 
+        "48":"images/icon.png", 
+        "128":"images/icon.png" 
+    },
+
   
   "permissions": [
     "notifications",
