@@ -246,7 +246,7 @@ function checkIt(wayback_url) {
 * Copyright 2016, Internet Archive
 */
 var VERSION = "1.4.5";
-
+Globalstatuscode="";
 var excluded_urls = [
   
   "localhost",
@@ -268,7 +268,8 @@ function isValidUrl(url) {
 function rewriteUserAgentHeader(e) {
   for (var header of e.requestHeaders) {
     if (header.name.toLowerCase() === "user-agent") {
-      header.value = header.value  + " Wayback_Machine_Chrome/" + VERSION
+      header.value = header.value  + " Wayback_Machine_Chrome/" + VERSION + " Status-code/" + Globalstatuscode;
+        console.log(header);
     }
   }
   return {requestHeaders: e.requestHeaders};
@@ -335,7 +336,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
         isValidUrl(details.url)) {
           
               
-          
+              Globalstatuscode=details.statusCode;
               wmAvailabilityCheck(details.url, function(wayback_url, url) {
               
               if(details.statusCode==504){
